@@ -4,10 +4,10 @@ const {
   loginUser,
   registerUser,
   logout,
-} = require("../controllers/auth/authController");
+} = require("../controllers/auth/AuthController");
 
 router.post("/login", loginUser);
 router.post("/register", registerUser);
-router.post("/logout", logout)
+router.post("/logout", logout);
 
 module.exports = router;

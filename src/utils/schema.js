@@ -37,4 +37,77 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = { userSchema };
+const userProfileSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    occupation: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    photoUrl: {
+      type: String,
+      required: false,
+    },
+    dateOfBirth: {
+      type: Date,
+      required: false,
+    },
+    location: String,
+    // skills: [String],
+    education: {
+      degree: String,
+      major: String,
+      graduationYear: Number,
+      stillInSchool: {
+        type: Boolean,
+        default: false,
+      },
+      institution: String,
+      location: String,
+    },
+
+    workExperience: [
+      {
+        jobTitle: String,
+        company: String,
+        startDate: Date,
+        endDate: Date,
+        stillWorkingHere: {
+          type: Boolean,
+          default: false,
+        },
+        location: String,
+      },
+    ],
+    yearsOfExperience: {
+      type: Number,
+      required: true,
+    },
+    twitterLink: {
+      type: String,
+      required: false,
+    },
+    githubLink: {
+      type: String,
+      required: false,
+    },
+    websiteLink: {
+      type: String,
+      required: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = { userSchema, userProfileSchema };

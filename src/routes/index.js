@@ -1,12 +1,19 @@
 const express = require("express");
+const verifyToken = require("../middlewares/authMiddleware");
 const router = express.Router();
 
-// const postRoutes = require("./postRoutes");
 const authRoutes = require("./authRoutes");
-// const userProfileRoutes = require("./userProfileRoutes");
+router.use("/auth", authRoutes);
 
-router.use("/v1/auth", authRoutes);
+// protected routes
+const userProfileRoutes = require("./userProfileRoutes");
+// const postRoutes = require("./postRoutes");
+
+router.use(
+  "/developers/:id/profile",
+  verifyToken,
+  userProfileRoutes
+);
 // router.use("/v1/posts", postRoutes);
-// router.use("/v1/user", userProfileRoutes);
 
 module.exports = router;

@@ -13,6 +13,6 @@ app.use(express.json());
 
 // import routes
 const allRoutes = require("./routes/index");
-app.use("/api", allRoutes);
+app.use("/api/v1", allRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
