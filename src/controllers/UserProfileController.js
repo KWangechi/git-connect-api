@@ -1,6 +1,8 @@
 const express = require("express");
 const asyncHandler = require("../middlewares/asyncHandler");
 const UserProfile = require("../models/UserProfile");
+const User = require("../models/User");
+const user = require("../models/User");
 
 const app = express();
 
@@ -13,21 +15,37 @@ app.use(express.json());
  * Get the Profile of a Developer
  */
 const index = asyncHandler(async (req, res, next) => {
-  console.log(req.username);
-  const userProfile = await UserProfile.findOne()
-    .where("username")
-    .equals(req.username);
+  const user = await User.findOne({ username: req.params?.username });
 
-    
+  if (!user) {
+    return next(
+      res.status(401).json({
+        status: {
+          code: 401,
+          message: "Username Not Found",
+        },
+      })
+    );
+  }
+
+  const userId = user._id;
+
+  const userProfile = await UserProfile.findOne()
+    .where("userId")
+    .equals(userId);
 
   if (!userProfile)
     return next(
       res.status(404).json({ message: "User Profile not found", code: 404 })
     );
 
-  console.log(userProfile);
-
-  res.json(userProfile);
+  res.status(200).json({
+    status: {
+      message: "User Profile Found!",
+      code: 200,
+    },
+    data: userProfile,
+  });
 });
 
 /**
@@ -49,8 +67,6 @@ const store = asyncHandler(async (req, res, next) => {
     websiteLink: req.body.websiteLink,
     githubLink: req.body.githubLink,
   });
-
-  console.log(userProfile);
 
   const savedUserProfile = await userProfile.save();
   if (!savedUserProfile)
@@ -75,16 +91,41 @@ const store = asyncHandler(async (req, res, next) => {
   // sendEmail(userProfile.emailAddress, "New Developer Profile", `Your profile has been created.`);
 });
 
-// UPDATE
+/**
+ * Update details of the logged in user only
+ */
 
 const update = asyncHandler(async (req, res, next) => {
-  const userProfile = await UserProfile.findByIdAndUpdate(
-    req.params.id,
+  const user = await User.findOne({ username: req.params?.username });
+
+  if (!user)
+    return next(
+      res.status(404).json({
+        status: {
+          message: "Username not found",
+          code: 404,
+        },
+      })
+    );
+
+  const userProfile = await UserProfile.findOneAndUpdate(
+    { userId: user._id },
     req.body,
     { new: true }
   );
 
-  if (!userProfile) return res.status(404).json({ message: "User not found" });
+  if (!userProfile)
+    return next(res.status(404).json({ message: "User Profile not found" }));
+
+  if (req.userId !== user._id.toString())
+    return next(
+      res.status(500).json({
+        status: {
+          message: "Action not allowed on this username!",
+          code: 500,
+        },
+      })
+    );
 
   res.status(200).json({
     status: {
@@ -93,20 +134,44 @@ const update = asyncHandler(async (req, res, next) => {
     },
     data: userProfile,
   });
-
-  // send email or notification to the user about the updated profile
-  // sendEmail(userProfile.emailAddress, "Developer Profile Updated", `Your profile has been updated.`);
 });
 
-// DELETE
+/**
+ * Delete a user profile
+ */
 const destroy = asyncHandler(async (req, res, next) => {
-  const userProfile = await UserProfile.findByIdAndDelete(req.params.id);
+  const user = await User.findOne({ username: req.params?.username });
 
-  if (!userProfile) return res.status(404).json({ message: "User not found" });
+  if (!user)
+    return next(
+      res.status(404).json({
+        status: {
+          message: "Username not found",
+          code: 404,
+        },
+      })
+    );
+
+  const userProfile = await UserProfile.findOneAndDelete({ userId: user._id });
+
+  if (!userProfile)
+    return next(
+      res.status(404).json({ message: "User Profile not found", code: 404 })
+    );
+
+  if (req.userId !== user._id.toString())
+    return next(
+      res.status(500).json({
+        status: {
+          message: "Action not allowed on this username!",
+          code: 500,
+        },
+      })
+    );
 
   res
-    .status(204)
-    .json({ message: "User profile deleted successfully!", code: 204 });
+    .status(200)
+    .json({ message: "User profile deleted successfully!", code: 200 });
 
   // send email or notification to the user about the deleted profile
   // sendEmail(userProfile.emailAddress, "Developer Profile Deleted", `Your profile has been deleted.`);

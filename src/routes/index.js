@@ -10,7 +10,7 @@ const userProfileRoutes = require("./userProfileRoutes");
 // const postRoutes = require("./postRoutes");
 
 router.use(
-  "/developers/:id/profile",
+  "/developers/:username/profile",
   verifyToken,
   userProfileRoutes
 );
