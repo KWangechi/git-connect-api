@@ -5,9 +5,10 @@ const {
   registerUser,
   logout,
 } = require("../controllers/auth/AuthController");
+const verifyToken = require("../middlewares/authMiddleware");
 
 router.post("/login", loginUser);
 router.post("/register", registerUser);
-router.post("/logout", logout);
+router.post("/logout", verifyToken, logout);
 
 module.exports = router;

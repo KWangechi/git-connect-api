@@ -2,7 +2,6 @@ const express = require("express");
 const asyncHandler = require("../middlewares/asyncHandler");
 const UserProfile = require("../models/UserProfile");
 const User = require("../models/User");
-const user = require("../models/User");
 
 const app = express();
 

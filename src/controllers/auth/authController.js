@@ -3,6 +3,7 @@ const asyncHandler = require("../../middlewares/asyncHandler");
 const User = require("../../models/User");
 const bcrypt = require("bcrypt");
 const { createAccessToken } = require("../../utils/generateTokens");
+const TokenBlacklist = require("../../models/TokenBlacklist");
 
 const app = express();
 
@@ -19,7 +20,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     confirmPassword,
   } = req.body;
 
-  // const { error, value } = userSchema.validate({ emailAddress, password });
+  // const { errors, value } = user.validateSync({ emailAddress, password });
   const userEmail = await User.findOne({ emailAddress });
   const userName = await User.findOne({ username });
 
@@ -133,21 +134,26 @@ const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 const logout = asyncHandler(async (req, res, next) => {
-  // TODO: Implement logout logic here
-  // e.g., delete the access token from the database or invalidate it
-  // and send a response to the client indicating that they've been logged out
-  const accessToken = req.headers.authorization.split("")[1];
+  const authHeader = req.headers["authorization"] || req.headers["Authorization"];
 
-  console.log("User logged out successfully");
+  if (!authHeader) return next(res.status(204));
 
-  // Send a response to the client indicating that they've been logged out
+  const accessToken = authHeader.split(" ")[1];
 
-  // res.status(200).json({
-  //   status: {
-  //     code: 200,
-  //     message: "User Logged Out Successfully",
-  //   },
-  // });
+  const isTokenBlacklisted = await TokenBlacklist.findOne({ accessToken });
+
+  if (isTokenBlacklisted) {
+    return next(res.status(204));
+  }
+
+  // Add token to blacklisted collection
+  const newBlacklistedToken = new TokenBlacklist({ accessToken });
+  await newBlacklistedToken.save();
+
+  // Remove this token and also clear the authorization header
+  res.setHeader("Authorization", null);
+  res.setHeader("Access-Control-Allow-Credentials", "false");
+
   res.status(200).json({
     status: {
       code: 200,

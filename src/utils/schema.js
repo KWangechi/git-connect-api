@@ -13,12 +13,10 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      unique: true,
     },
     emailAddress: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       match: [
         /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
@@ -28,7 +26,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      min: [6, "Password should be minimum 6 characters"],
+      validator: function () {
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        return passwordRegex.test(this.password);
+      },
       // select: false,
     },
   },
@@ -51,7 +54,6 @@ const userProfileSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: true,
-      unique: true,
     },
     photoUrl: {
       type: String,
@@ -110,4 +112,48 @@ const userProfileSchema = new mongoose.Schema(
   }
 );
 
-module.exports = { userSchema, userProfileSchema };
+const postSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    title: {
+      type: String,
+      required: [true, "Title is Required"],
+    },
+    content: {
+      type: String,
+      required: [true, "Content is required"],
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const tokenBlacklistSchema = new mongoose.Schema(
+  {
+    accessToken: {
+      type: String,
+      required: true,
+      ref: "User",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = {
+  userSchema,
+  userProfileSchema,
+  tokenBlacklistSchema,
+  postSchema,
+};
