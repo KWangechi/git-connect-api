@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
       if (error)
         return next(
           res.status(403).json({
-            message: "Invalid Token",
+            message: "Unauthorized Access",
             code: 403,
           })
         );

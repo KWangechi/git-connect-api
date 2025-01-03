@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+// const { validate } = require("../models/UserProfile");
 
 const userSchema = new mongoose.Schema(
   {
@@ -55,7 +56,7 @@ const userProfileSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      required: false,
+      required: true,
     },
     dateOfBirth: {
       type: Date,
@@ -92,18 +93,45 @@ const userProfileSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    twitterLink: {
-      type: String,
-      required: false,
-    },
-    githubLink: {
-      type: String,
-      required: false,
-    },
-    websiteLink: {
-      type: String,
-      required: false,
-    },
+    socialLinks: [
+      {
+        platform: {
+          type: String,
+          required: true,
+          validate: {
+            validator: function (platform) {
+              return ["twitter", "website", "github"].includes(platform);
+            },
+            message: (props) => `${props.value} is not a valid platform.`,
+          },
+        },
+        url: {
+          type: String,
+          required: true,
+          validate: {
+            validator: function (url) {
+              if (this.platform) {
+                switch (this.platform) {
+                  case "twitter":
+                    return /^https:\/\/(www\.)?x\.com\/\w+$/i.test(url);
+                  case "website":
+                    return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/i.test(
+                      url
+                    );
+                  case "github":
+                    return /^https:\/\/(www\.)?github\.com\/\w+$/i.test(url);
+                  default:
+                    return false;
+                }
+              }
+              return false;
+            },
+            message: (props) =>
+              `${props.value} is not a valid URL for the specified platform.`,
+          },
+        },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -63,10 +63,30 @@ const store = asyncHandler(async (req, res, next) => {
     dateOfBirth: req.body.dateOfBirth,
     location: req.body.location,
     education: req.body.education,
-    twitterLink: req.body.twitterLink,
-    websiteLink: req.body.websiteLink,
-    githubLink: req.body.githubLink,
+    socialLinks: req.body.socialLinks,
   });
+
+  const validationError = userProfile.validateSync();
+
+  if (validationError) {
+    let errors = [];
+
+    console.log(validationError.errors);
+
+    for (const field in validationError.errors) {
+      errors.push({
+        field: field,
+        message: validationError.errors[field].message,
+      });
+    }
+    return res.status(400).json({
+      status: {
+        message: "Invalid user profile data",
+        code: 400,
+      },
+      data: errors,
+    });
+  }
 
   const savedUserProfile = await userProfile.save();
   if (!savedUserProfile)
