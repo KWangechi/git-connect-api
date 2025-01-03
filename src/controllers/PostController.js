@@ -1,8 +1,7 @@
 const express = require("express");
 const asyncHandler = require("../middlewares/asyncHandler");
-const Post = require("../models/post");
 const User = require("../models/User");
-const { postSchema } = require("../utils/schema");
+const Post = require("../models/post");
 
 const app = express();
 
@@ -117,9 +116,17 @@ const show = asyncHandler(async (req, res, next) => {
 
 const update = asyncHandler(async (req, res, next) => {
   // find the Post by its ID from the request parameters and the current user Id
-  const user = User.findOne({ username: req.params.username });
+  const user = await User.findOne({ username: req.params.username });
 
-  if (req.userId !== user._id.toString()) {
+  if (!user)
+    return next(
+      res.status(404).json({
+        message: "User not found",
+        code: 404,
+      })
+    );
+
+  if (req.userId !== user._id?.toString()) {
     return next(
       res.status(500).json({
         status: {
@@ -130,8 +137,11 @@ const update = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // the posts should be for the user that has been found
+
   const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
+    runValidators: true,
   });
 
   if (!post) {
