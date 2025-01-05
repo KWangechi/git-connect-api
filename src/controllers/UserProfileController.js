@@ -2,7 +2,8 @@ const express = require("express");
 const asyncHandler = require("../middlewares/asyncHandler");
 const UserProfile = require("../models/UserProfile");
 const User = require("../models/User");
-const user = require("../models/User");
+const { upload } = require("../utils/uploadPhotos");
+const path = require("path");
 
 const app = express();
 
@@ -19,11 +20,9 @@ const index = asyncHandler(async (req, res, next) => {
 
   if (!user) {
     return next(
-      res.status(401).json({
-        status: {
-          code: 401,
-          message: "Username Not Found",
-        },
+      res.status(404).json({
+        code: 404,
+        message: "User Not Found",
       })
     );
   }
@@ -52,60 +51,95 @@ const index = asyncHandler(async (req, res, next) => {
  * Create a user profile for the logged in user
  */
 const store = asyncHandler(async (req, res, next) => {
-  // create a profile for the currently logged in user
-  const userProfile = new UserProfile({
-    userId: req.userId,
-    workExperience: req.body.workExperience,
-    occupation: req.body.occupation,
-    phoneNumber: req.body.phoneNumber,
-    yearsOfExperience: req.body.yearsOfExperience,
-    photoUrl: req.body.photoUrl,
-    dateOfBirth: req.body.dateOfBirth,
-    location: req.body.location,
-    education: req.body.education,
-    socialLinks: req.body.socialLinks,
-  });
-
-  const validationError = userProfile.validateSync();
-
-  if (validationError) {
-    let errors = [];
-
-    console.log(validationError.errors);
-
-    for (const field in validationError.errors) {
-      errors.push({
-        field: field,
-        message: validationError.errors[field].message,
-      });
-    }
-    return res.status(400).json({
-      status: {
-        message: "Invalid user profile data",
-        code: 400,
-      },
-      data: errors,
+  // check if the user exists first
+  const user = await User.findOne({ username: req.params.username });
+  if (!user) {
+    return res.status(404).json({
+      code: 404,
+      message: "User Not Found",
     });
   }
 
-  const savedUserProfile = await userProfile.save();
-  if (!savedUserProfile)
-    return next(
-      res.json({
+  // handle when a file is uploaded
+  let photoUrl;
+  try {
+    photoUrl = await upload(req);
+    if (!photoUrl) {
+      return res.status(400).json({
+        message: error || "Failed to upload photo",
+        code: 400,
+      });
+    }
+
+    // Process the text data of the form
+    // current path of the folder project
+    const absoluteProfilePhotoUrl = path.join(__dirname, photoUrl);
+
+    // sanitize and validate the user profile data
+    const userProfile = new UserProfile({
+      userId: req.userId,
+      workExperience: JSON.parse(req.body.workExperience),
+      occupation: req.body.occupation,
+      phoneNumber: req.body.phoneNumber,
+      yearsOfExperience: req.body.yearsOfExperience,
+      photoUrl: absoluteProfilePhotoUrl,
+      dateOfBirth: req.body.dateOfBirth,
+      location: req.body.location,
+      education: JSON.parse(req.body.education),
+      socialLinks: JSON.parse(req.body.socialLinks),
+    });
+
+    const validationError = userProfile.validateSync();
+
+    if (validationError) {
+      let errors = [];
+
+      console.log(validationError.errors);
+
+      for (const field in validationError.errors) {
+        errors.push({
+          field: field,
+          message: validationError.errors[field].message,
+        });
+      }
+      return res.status(400).json({
         status: {
-          message: "Error occurred!",
+          message: "Invalid user profile data",
+          code: 400,
+        },
+        data: errors,
+      });
+    }
+
+    const savedUserProfile = await userProfile.save();
+    if (!savedUserProfile)
+      return next(
+        res.json({
+          status: {
+            message: "Error occurred!",
+            code: 500,
+          },
+        })
+      );
+
+    res.status(201).json({
+      status: {
+        message: "User profile created successfully!",
+        code: 201,
+      },
+      data: savedUserProfile,
+    });
+  } catch (error) {
+    return next(
+      res.status(500).json({
+        status: {
+          message: "Error occurred while processing post",
           code: 500,
         },
+        data: error.message,
       })
     );
-
-  res.status(201).json({
-    status: {
-      message: "User profile created successfully!",
-      code: 201,
-    },
-    data: savedUserProfile,
-  });
+  }
 
   // send email or notification to the user about the new profile
   // sendEmail(userProfile.emailAddress, "New Developer Profile", `Your profile has been created.`);
@@ -121,17 +155,20 @@ const update = asyncHandler(async (req, res, next) => {
   if (!user)
     return next(
       res.status(404).json({
-        status: {
-          message: "Username not found",
-          code: 404,
-        },
+        message: "User not found",
+        code: 404,
       })
     );
+
+  // check if an image is being uploaded
+  const updatedUserProfile = {
+    ...req.body,
+  };
 
   const userProfile = await UserProfile.findOneAndUpdate(
     { userId: user._id },
     req.body,
-    { new: true }
+    { new: false }
   );
 
   if (!userProfile)
@@ -165,10 +202,8 @@ const destroy = asyncHandler(async (req, res, next) => {
   if (!user)
     return next(
       res.status(404).json({
-        status: {
-          message: "Username not found",
-          code: 404,
-        },
+        message: "User not found",
+        code: 404,
       })
     );
 

@@ -14,12 +14,10 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      unique: true,
     },
     emailAddress: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       match: [
         /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
@@ -30,7 +28,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 6,
-      // select: false,
     },
   },
   {
@@ -52,8 +49,11 @@ const userProfileSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: true,
-      unique: true,
     },
+    // profilePhoto: {
+    //   type: Object,
+    //   required: false,
+    // },
     photoUrl: {
       type: String,
       required: true,
