@@ -127,9 +127,39 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: [true, "Content is required"],
     },
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    dislikes: {
+      type: Number,
+      default: 0,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const commentSchema = new mongoose.Schema(
+  {
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
+    commentedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
+      type: String,
       required: true,
     },
   },
@@ -156,4 +186,5 @@ module.exports = {
   userProfileSchema,
   tokenBlacklistSchema,
   postSchema,
+  commentSchema,
 };

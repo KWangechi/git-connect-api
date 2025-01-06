@@ -116,10 +116,8 @@ const loginUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // generate a token and check if they match
+  // generate a token
   const accessToken = createAccessToken(user);
-
-  console.log(accessToken);
 
   res.status(200).json({
     status: {
@@ -134,7 +132,8 @@ const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 const logout = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers["authorization"] || req.headers["Authorization"];
+  const authHeader =
+    req.headers["authorization"] || req.headers["Authorization"];
 
   if (!authHeader) return next(res.status(204));
 

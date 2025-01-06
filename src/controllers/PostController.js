@@ -38,14 +38,13 @@ const store = asyncHandler(async (req, res, next) => {
     if (validationError) {
       let errors = [];
 
-      console.log(validationError.errors);
-
       for (const field in validationError.errors) {
         errors.push({
           field: field,
           message: validationError.errors[field].message,
         });
       }
+
       return res.status(400).json({
         status: {
           message: "Invalid post data",
@@ -55,7 +54,6 @@ const store = asyncHandler(async (req, res, next) => {
       });
     }
 
-    // save the Post to the database
     const savedPost = await post.save();
 
     if (!savedPost) {
@@ -92,7 +90,7 @@ const store = asyncHandler(async (req, res, next) => {
 
 const show = asyncHandler(async (req, res, next) => {
   // find the Post by its ID from the request parameters
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findOne({ _id: req.params.id });
 
   if (!post) {
     return next(
@@ -166,7 +164,16 @@ const update = asyncHandler(async (req, res, next) => {
 
 const destroy = asyncHandler(async (req, res, next) => {
   // find the Post by its ID from the request parameters
-  const user = User.findOne({ username: req.params.username });
+  const user = await User.findOne({ username: req.params.username });
+
+  if (!user) {
+    return next(
+      res.status(404).json({
+        message: "User not found",
+        code: 404,
+      })
+    );
+  }
 
   if (req.userId !== user._id.toString()) {
     return next(
@@ -178,7 +185,7 @@ const destroy = asyncHandler(async (req, res, next) => {
       })
     );
   }
-  const post = await Post.findByIdAndDelete(req.params.id);
+  const post = await Post.findOneAndDelete({ _id: req.params.id });
 
   if (!post) {
     return next(
@@ -191,7 +198,7 @@ const destroy = asyncHandler(async (req, res, next) => {
     );
   }
 
-  res.status(204).json({
+  res.status(200).json({
     status: {
       message: "Post deleted successfully",
       code: 204,
