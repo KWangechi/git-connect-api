@@ -4,7 +4,7 @@ const Comment = require("./Comment");
 
 // send an error if the user being referenced in the post routes doesn't exist anymore
 
-postSchema.pre("findOneAndDelete", async function (next) {
+postSchema.pre("findOneAndDelete", async function () {
   const doc = await this.model.findOne(this.getFilter());
 
   try {
@@ -14,16 +14,5 @@ postSchema.pre("findOneAndDelete", async function (next) {
     console.error("Error deleting associated comments and likes:", error);
   }
 });
-
-// handle delete cascades for child models e.g Schema
-// postSchema.pre("remove", async function (next) {
-//   try {
-//     await this.model("Comment").deleteMany({ postId: this._id });
-//     // await this.model("Like").deleteMany({ post: this._id });
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 module.exports = mongoose.model("Post", postSchema);
