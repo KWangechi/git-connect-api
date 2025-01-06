@@ -5,6 +5,7 @@ const {
   show,
   likePost,
   unlikePost,
+  toggleLikePost,
 } = require("../controllers/PostController");
 const {
   index: viewAllComments,
@@ -25,7 +26,6 @@ router.patch(`${commentRoutePrefix}/:id`, updateComment);
 router.delete(`${commentRoutePrefix}/:id`, deleteComment);
 
 // likes and dislikes
-router.post("/:id/likePost", likePost);
-router.post("/:id/unlikePost", unlikePost);
+router.post("/:id/toggleLikePost", toggleLikePost);
 
 module.exports = router;
