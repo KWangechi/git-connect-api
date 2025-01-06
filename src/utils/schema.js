@@ -127,11 +127,11 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: [true, "Content is required"],
     },
-    likes: {
-      type: Number,
-      default: 0,
+    liked: {
+      type: Boolean,
+      default: false,
     },
-    dislikes: {
+    likes: {
       type: Number,
       default: 0,
     },
@@ -168,6 +168,22 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
+const likePostSchema = new mongoose.Schema(
+  {
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
+    likedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
 const tokenBlacklistSchema = new mongoose.Schema(
   {
     accessToken: {
@@ -185,6 +201,7 @@ module.exports = {
   userSchema,
   userProfileSchema,
   tokenBlacklistSchema,
+  likePostSchema,
   postSchema,
   commentSchema,
 };
