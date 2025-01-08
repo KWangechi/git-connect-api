@@ -5,7 +5,7 @@ const {
   registerUser,
   logout,
 } = require("../controllers/auth/AuthController");
-const { index } = require("../controllers/UserProfileController");
+const { index, search } = require("../controllers/UserProfileController");
 const verifyToken = require("../middlewares/authMiddleware");
 
 const authPath = "/auth";
@@ -16,5 +16,6 @@ router.get(`${authPath}/logout`, logout);
 
 // get all the users
 router.get("/developers", verifyToken, index);
+router.get("/developers/search", verifyToken, search);
 
 module.exports = router;

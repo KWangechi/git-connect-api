@@ -30,6 +30,66 @@ const index = asyncHandler(async (req, res, next) => {
   );
 });
 
+const search = asyncHandler(async (req, res, next) => {
+  const { searchTerm } = req.query;
+  console.log(searchTerm);
+
+  // an array of fields in the user that can be searched
+  // const searchFields = [
+  //   "username",
+  //   /^Name/,
+  //   /profile.(*)/,
+  //   // /profile\.education\.institution/,
+  // ];
+
+  // // search for the searchTerm in any of the searchFields
+  // const users = await User.find({
+  //   $or: searchFields.map((field) => ({
+  //     [field]: { $regex: searchTerm, $options: "i" },
+  //   })),
+  // });
+
+  const searchFields = [
+    "username",
+    "firstName", // Changed regex to field name
+    "profile.occupation", // Example of a specific nested field
+    "profile.education.institution", // Nested field
+  ];
+
+  // Use $or to search for the `searchTerm` in all `searchFields`
+  const users = await User.find({
+    $or: searchFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: "i" },
+    })),
+  });
+
+  // const users = await User.find({
+  //   $or: [
+  //     { username: { $regex: searchTerm, $options: "i" } },
+  //     { email: { $regex: searchTerm, $options: "i" } },
+  //   ],
+  // });
+
+  if (!users.length) {
+    return next(
+      res.status(404).json({
+        code: 404,
+        message: "No Users Found",
+      })
+    );
+  }
+
+  return next(
+    res.json({
+      status: {
+        message: "Users Found",
+        code: 200,
+      },
+      data: users,
+    })
+  );
+});
+
 const show = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ username: req.params?.username });
 
@@ -55,7 +115,6 @@ const show = asyncHandler(async (req, res, next) => {
  * Create a user profile for the logged in user and also allow updates
  */
 const update = asyncHandler(async (req, res, next) => {
-  console.log(req.userId);
   try {
     // Check if the user exists
     const user = await User.findOne({ username: req.params.username });
@@ -190,4 +249,4 @@ const destroy = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { index, show, destroy, update };
+module.exports = { index, show, destroy, update, search };
