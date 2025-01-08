@@ -1,7 +1,7 @@
 // Middleware for handling CORS
 const corsHandler = (req, res, next) => {
   // List of origins allowed to access the server (CORS whitelist)
-  const whitelist = ["http://localhost:3000", "http://localhost/5173"];
+  const whitelist = ["http://localhost:5000", "http://localhost/5173"];
 
   // Get the origin of the incoming request
   const origin = req.get("origin");
