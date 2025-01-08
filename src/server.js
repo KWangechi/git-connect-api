@@ -9,14 +9,13 @@ const PORT = process.env.PORT || 5000;
 
 startConnection();
 
-// Handling of files
-app.use(
-  "/api/public/images",
-  express.static(path.join(__dirname, "/public/images"))
-);
+// CORS Handler
+const corsHandler = require("./middlewares/corsHandler");
+app.use(corsHandler);
 
 // allow Parsing of JSON payloads to routes
 app.use(express.json());
+
 
 // import routes
 const allRoutes = require("./routes/index");

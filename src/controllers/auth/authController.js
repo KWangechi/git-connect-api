@@ -93,7 +93,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   if (!user) {
     return next(
-      res.status(401).json({
+      res.json({
         status: {
           code: 401,
           message: "Invalid email or password",
@@ -106,7 +106,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   if (!isPasswordValid) {
     return next(
-      res.status(401).json({
+      res.json({
         status: {
           code: 401,
           message: "Invalid email or password",
@@ -117,8 +117,6 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   // generate a token and check if they match
   const accessToken = createAccessToken(user);
-
-  console.log(accessToken);
 
   res.status(200).json({
     status: {
