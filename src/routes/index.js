@@ -3,7 +3,7 @@ const verifyToken = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 const authRoutes = require("./authRoutes");
-router.use("/auth", authRoutes);
+router.use("/", authRoutes);
 
 // protected routes
 const userProfileRoutes = require("./userProfileRoutes");

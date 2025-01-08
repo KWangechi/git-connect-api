@@ -1,14 +1,12 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 const {
-  index,
+  show,
   update,
-  store,
   destroy,
 } = require("../controllers/UserProfileController");
 
-router.get("/", index);
-router.post("/", store);
+router.get("/", show);
 router.patch("/", update);
 router.delete("/", destroy);
 
