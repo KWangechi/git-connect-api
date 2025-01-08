@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// const { validate } = require("../models/UserProfile");
 const userProfileSchema = new mongoose.Schema(
   {
     // userId: {

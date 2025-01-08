@@ -1,7 +1,6 @@
 const express = require("express");
 const process = require("process");
 const asyncHandler = require("../middlewares/asyncHandler");
-const UserProfile = require("../models/UserProfile");
 const User = require("../models/User");
 const { upload } = require("../utils/uploadPhotos");
 const path = require("path");
