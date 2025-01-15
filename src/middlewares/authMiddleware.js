@@ -1,7 +1,8 @@
 // should protect the user profile and post routes - auth middleware
 const jwt = require("jsonwebtoken");
+const TokenBlacklist = require("../models/TokenBlacklist");
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   let accessToken;
 
   const authHeader = req.header("Authorization") || req.header("authorization");
@@ -15,6 +16,20 @@ const verifyToken = (req, res, next) => {
     );
   }
   accessToken = authHeader.toString().split(" ")[1];
+
+  // check that this token is not in the blacklisted collection
+  const isTokenBlacklisted = await TokenBlacklist.findOne({
+    accessToken,
+  });
+
+  if (isTokenBlacklisted) {
+    return next(
+      res.status(401).json({
+        message: "Session Expired! Please Login",
+        code: 401,
+      })
+    );
+  }
 
   // verify the token now
   jwt.verify(
