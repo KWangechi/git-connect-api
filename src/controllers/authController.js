@@ -1,8 +1,8 @@
 const express = require("express");
-const asyncHandler = require("../../middlewares/asyncHandler");
-const User = require("../../models/User");
+const asyncHandler = require("../middlewares/asyncHandler");
+const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { createAccessToken } = require("../../utils/generateTokens");
+const { createAccessToken } = require("../utils/generateTokens");
 
 const app = express();
 
