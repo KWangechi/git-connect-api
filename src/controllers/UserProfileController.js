@@ -32,7 +32,6 @@ const index = asyncHandler(async (req, res, next) => {
 
 const search = asyncHandler(async (req, res, next) => {
   const { searchTerm } = req.query;
-  console.log(searchTerm);
 
   // an array of fields in the user that can be searched
   // const searchFields = [
@@ -62,13 +61,6 @@ const search = asyncHandler(async (req, res, next) => {
       [field]: { $regex: searchTerm, $options: "i" },
     })),
   });
-
-  // const users = await User.find({
-  //   $or: [
-  //     { username: { $regex: searchTerm, $options: "i" } },
-  //     { email: { $regex: searchTerm, $options: "i" } },
-  //   ],
-  // });
 
   if (!users.length) {
     return next(
