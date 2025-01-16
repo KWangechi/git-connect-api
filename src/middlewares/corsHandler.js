@@ -4,7 +4,8 @@ const corsHandler = (req, res, next) => {
   const whitelist = ["http://localhost:5000", "http://localhost/5173"];
 
   // Get the origin of the incoming request
-  const origin = req.get("origin");
+  // const requestUrl = req.get('')
+  const origin = req.get("origin") || req.get("Referer");
 
   // Check if the origin is in the whitelist
   const isWhitelisted = whitelist.includes(origin);

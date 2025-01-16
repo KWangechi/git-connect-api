@@ -51,45 +51,71 @@ const userProfileSchema = new mongoose.Schema(
     ],
     yearsOfExperience: {
       type: Number,
-      required: true,
+      required: false,
     },
     socialLinks: [
       {
-        platform: {
+        websiteLink: {
           type: String,
-          required: true,
           validate: {
-            validator: function (platform) {
-              return ["twitter", "website", "github"].includes(platform);
+            validator: function (websiteLink) {
+              return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/i.test(
+                this.websiteLink
+              );
             },
-            message: (props) => `${props.value} is not a valid platform.`,
           },
         },
-        url: {
+        twitterLink: {
           type: String,
-          required: true,
           validate: {
-            validator: function (url) {
-              if (this.platform) {
-                switch (this.platform) {
-                  case "twitter":
-                    return /^https:\/\/(www\.)?x\.com\/\w+$/i.test(url);
-                  case "website":
-                    return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/i.test(
-                      url
-                    );
-                  case "github":
-                    return /^https:\/\/(www\.)?github\.com\/\w+$/i.test(url);
-                  default:
-                    return false;
-                }
-              }
-              return false;
+            validator: function (twitterLink) {
+              return /^https:\/\/(www\.)?x\.com\/\w+$/i.test(twitterLink);
             },
-            message: (props) =>
-              `${props.value} is not a valid URL for the specified platform.`,
+          },
+          githubLink: {
+            type: String,
+            validate: {
+              validator: function (githubLink) {
+                return /^https:\/\/(www\.)?github\.com\/\w+$/i.test(githubLink);
+              },
+            },
           },
         },
+        // platform: {
+        //   type: String,
+        //   required: true,
+        //   validate: {
+        //     validator: function (platform) {
+        //       return ["twitter", "website", "github"].includes(platform);
+        //     },
+        //     message: (props) => `${props.value} is not a valid platform.`,
+        //   },
+        // },
+        // url: {
+        //   type: String,
+        //   required: true,
+        //   validate: {
+        //     validator: function (url) {
+        //       if (this.platform) {
+        //         switch (this.platform) {
+        //           case "twitter":
+        //             return /^https:\/\/(www\.)?x\.com\/\w+$/i.test(url);
+        //           case "website":
+        //             return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/i.test(
+        //               url
+        //             );
+        //           case "github":
+        //             return /^https:\/\/(www\.)?github\.com\/\w+$/i.test(url);
+        //           default:
+        //             return false;
+        //         }
+        //       }
+        //       return false;
+        //     },
+        //     message: (props) =>
+        //       `${props.value} is not a valid URL for the specified platform.`,
+        //   },
+        // },
       },
     ],
   },

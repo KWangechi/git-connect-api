@@ -96,7 +96,7 @@ const show = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: {
-      message: "User Profile Found!",
+      message: "Success",
       code: 200,
     },
     data: user,
@@ -128,8 +128,7 @@ const update = asyncHandler(async (req, res, next) => {
       );
 
     // Handle file upload
-    let photoUrl,
-      rootPath = process.cwd();
+    let photoUrl;
 
     try {
       photoUrl = await upload(req);
@@ -148,7 +147,9 @@ const update = asyncHandler(async (req, res, next) => {
         data: error.message,
       });
     }
-    const absoluteProfilePhotoUrl = path.join(rootPath, photoUrl);
+    const absoluteProfilePhotoUrl = `/${photoUrl}`;
+
+    console.log(absoluteProfilePhotoUrl);
 
     const updatedProfileData = {
       ...req.body,

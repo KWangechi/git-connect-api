@@ -108,7 +108,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
     return next(
       res.json({
         status: {
-          code: 401,
+          code: 400,
           message: "Invalid email or password",
         },
       })
