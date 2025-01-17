@@ -242,4 +242,31 @@ const destroy = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { index, show, destroy, update, search };
+/**
+ * Get currently logged in user
+ */
+
+const fetchUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.userId);
+
+  if (!user) {
+    return next(
+      res.status(404).json({
+        status: {
+          message: "User not found",
+          code: 404,
+        },
+      })
+    );
+  }
+
+  res.json({
+    status: {
+      message: "Success",
+      code: 200,
+    },
+    data: user,
+  });
+});
+
+module.exports = { index, show, destroy, update, search, fetchUser };
