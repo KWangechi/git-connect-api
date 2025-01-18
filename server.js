@@ -17,7 +17,8 @@ app.use(corsHandler);
 app.use(express.json());
 
 // allow access to statuc files
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
+
 
 // import routes
 const allRoutes = require("./src/routes/index");
