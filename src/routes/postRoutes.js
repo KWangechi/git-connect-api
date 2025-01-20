@@ -3,8 +3,6 @@ const router = express.Router({ mergeParams: true });
 const {
   index,
   show,
-  likePost,
-  unlikePost,
   toggleLikePost,
 } = require("../controllers/PostController");
 const {

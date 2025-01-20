@@ -1,10 +1,11 @@
 // Middleware for handling CORS
 const corsHandler = (req, res, next) => {
   // List of origins allowed to access the server (CORS whitelist)
-  const whitelist = ["http://localhost:5000", "http://localhost/5173"];
+  const whitelist = ["http://localhost:5000/", "http://localhost/5173/"];
 
   // Get the origin of the incoming request
-  const origin = req.get("origin");
+  // const requestUrl = req.get('')
+  const origin = req.get("origin") || req.get("Referer");
 
   // Check if the origin is in the whitelist
   const isWhitelisted = whitelist.includes(origin);
@@ -12,7 +13,7 @@ const corsHandler = (req, res, next) => {
   // Set CORS headers based on whether the origin is whitelisted
   if (isWhitelisted) {
     req.originSource = "Whitelisted Origin";
-    res.setHeader("Access-Control-Allow-Origin", req.get("origin"));
+    res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, OPTIONS, PUT, PATCH, DELETE"
@@ -31,7 +32,7 @@ const corsHandler = (req, res, next) => {
     // Allow CORS for all origins (note: this may have security implications).
     // Override this behavior based on your application's requirements.
     req.originSource = "Unknown Origin";
-    res.setHeader("Access-Control-Allow-Origin", req.get("origin"));
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, OPTIONS, PUT, PATCH, DELETE"

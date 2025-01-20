@@ -16,6 +16,9 @@ app.use(corsHandler);
 // allow Parsing of JSON payloads to routes
 app.use(express.json());
 
+// allow access to statuc files
+app.use(express.static("public"));
+
 
 // import routes
 const allRoutes = require("./src/routes/index");

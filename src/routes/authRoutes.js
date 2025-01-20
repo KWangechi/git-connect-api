@@ -4,11 +4,19 @@ const {
   loginUser,
   registerUser,
   logout,
-} = require("../controllers/AuthController");
+} = require("../controllers/authController");
+const { index, search, fetchUser } = require("../controllers/UserProfileController");
 const verifyToken = require("../middlewares/authMiddleware");
 
-router.post("/login", loginUser);
-router.post("/register", registerUser);
-router.post("/logout", verifyToken, logout);
+const authPath = "/auth";
+
+router.post(`${authPath}/login`, loginUser);
+router.post(`${authPath}/register`, registerUser);
+router.get(`${authPath}/logout`, verifyToken, logout);
+
+// get all the users
+router.get("/user", verifyToken, fetchUser);
+router.get("/developers", verifyToken, index);
+router.get("/developers/search", verifyToken, search);
 
 module.exports = router;

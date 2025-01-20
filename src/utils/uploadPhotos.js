@@ -18,7 +18,9 @@ const multerUpload = multer({
   fileFilter: function (req, file, cb) {
     const filetypes = /jpeg|jpg|png/;
     const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
 
     if (mimetype && extname) {
       return cb(null, true);
@@ -39,7 +41,10 @@ const upload = (req) => {
       } else if (!req.file) {
         reject("No file uploaded");
       } else {
-        const filePath = path.join(req.file.destination, req.file.filename);
+        const filePath = path
+          .join(req.file.destination, req.file.filename)
+          .replace(/public\\/g, "")
+          .replace(/\\/g, "/");
         resolve(filePath);
       }
     });
