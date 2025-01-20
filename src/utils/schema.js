@@ -56,19 +56,17 @@ const userProfileSchema = new mongoose.Schema(
     socialLinks: {
       websiteLink: {
         type: String,
-        validate: {
-          validator: function (websiteLink) {
-            return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/i.test(
-              this.websiteLink
-            );
-          },
-        },
+        // validate: {
+        //   validator: function (websiteLink) {
+        //     return websiteLink.includes(".com");
+        //   },
+        // },
       },
       twitterLink: {
         type: String,
         validate: {
           validator: function (twitterLink) {
-            return /^https:\/\/(www\.)?x\.com\/\w+$/i.test(twitterLink);
+            return /^https:\/\/?x\.com\/\w+$/i.test(twitterLink);
           },
         },
       },
@@ -76,7 +74,7 @@ const userProfileSchema = new mongoose.Schema(
         type: String,
         validate: {
           validator: function (githubLink) {
-            return /^https:\/\/(www\.)?github\.com\/\w+$/i.test(githubLink);
+            return /^https:\/\/?github\.com\/\w+$/i.test(githubLink);
           },
         },
       },
