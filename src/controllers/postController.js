@@ -15,7 +15,6 @@ app.use(express.json());
  * Create a Post
  */
 const index = asyncHandler(async (req, res, next) => {
-  // get all the Posts from the database using mongoose
   const posts = await Post.find();
 
   res.status(200).json({
@@ -266,6 +265,36 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
   }
 });
 
+const fetchUserPosts = asyncHandler(async (req, res, next) => {
+  // get the username from the params
+  const username = req.params.username;
+
+  // find the user by the username
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    return next(
+      res.status(404).json({
+        status: {
+          message: "User not found",
+          code: 404,
+        },
+      })
+    );
+  }
+
+  // find all the posts by the user
+  const posts = await Post.find({ userId: user._id });
+
+  res.json({
+    status: {
+      message: "Success",
+      code: 200,
+    },
+    data: posts,
+  });
+});
+
 module.exports = {
   index,
   store,
@@ -273,4 +302,5 @@ module.exports = {
   update,
   destroy,
   toggleLikePost,
+  fetchUserPosts,
 };

@@ -1,7 +1,8 @@
 const express = require("express");
-const process = require("process");
 const asyncHandler = require("../middlewares/asyncHandler");
 const User = require("../models/User");
+const Post = require("../models/post");
+
 const { upload } = require("../utils/uploadPhotos");
 const path = require("path");
 
@@ -61,15 +62,6 @@ const search = asyncHandler(async (req, res, next) => {
       [field]: { $regex: searchTerm, $options: "i" },
     })),
   });
-
-  if (!users.length) {
-    return next(
-      res.status(404).json({
-        code: 404,
-        message: "No Users Found",
-      })
-    );
-  }
 
   return next(
     res.json({
@@ -269,4 +261,11 @@ const fetchUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { index, show, destroy, update, search, fetchUser };
+module.exports = {
+  index,
+  show,
+  destroy,
+  update,
+  search,
+  fetchUser,
+};
