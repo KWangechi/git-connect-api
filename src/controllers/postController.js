@@ -15,7 +15,7 @@ app.use(express.json());
  * Create a Post
  */
 const index = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find();
+  const posts = await Post.find().populate("createdBy");
 
   res.status(200).json({
     status: {
@@ -90,7 +90,7 @@ const store = asyncHandler(async (req, res, next) => {
 
 const show = asyncHandler(async (req, res, next) => {
   // find the Post by its ID from the request parameters
-  const post = await Post.findOne({ _id: req.params.id });
+  const post = await Post.findOne({ _id: req.params.id }).populate("createdBy");
 
   if (!post) {
     return next(
@@ -208,6 +208,7 @@ const destroy = asyncHandler(async (req, res, next) => {
 
 const toggleLikePost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
+
   const likePost = await LikePost.findOne({
     postId: req.params.id,
     likedBy: req.userId,
@@ -230,10 +231,10 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
       await post.updateOne({
         $inc: { likes: -1 },
       });
-      res.status(201).json({
+      res.status(200).json({
         status: {
           message: "Post unliked!",
-          code: 201,
+          code: 200,
         },
       });
     } else {
@@ -245,10 +246,10 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
       await post.updateOne({
         $inc: { likes: 1 },
       });
-      res.status(201).json({
+      res.status(200).json({
         status: {
           message: "Post liked!",
-          code: 201,
+          code: 200,
         },
       });
     }

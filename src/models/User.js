@@ -29,4 +29,4 @@ userSchema.pre("findOneAndDelete", async function () {
   }
 });
 
-module.exports = mongoose.model("users", userSchema);
+module.exports = mongoose.model("User", userSchema);
