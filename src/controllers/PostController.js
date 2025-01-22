@@ -15,8 +15,7 @@ app.use(express.json());
  * Create a Post
  */
 const index = asyncHandler(async (req, res, next) => {
-  // get all the Posts from the database using mongoose
-  const posts = await Post.find();
+  const posts = await Post.find().populate("createdBy");
 
   res.status(200).json({
     status: {
@@ -91,7 +90,7 @@ const store = asyncHandler(async (req, res, next) => {
 
 const show = asyncHandler(async (req, res, next) => {
   // find the Post by its ID from the request parameters
-  const post = await Post.findOne({ _id: req.params.id });
+  const post = await Post.findOne({ _id: req.params.id }).populate("createdBy");
 
   if (!post) {
     return next(
@@ -209,6 +208,7 @@ const destroy = asyncHandler(async (req, res, next) => {
 
 const toggleLikePost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
+
   const likePost = await LikePost.findOne({
     postId: req.params.id,
     likedBy: req.userId,
@@ -231,10 +231,10 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
       await post.updateOne({
         $inc: { likes: -1 },
       });
-      res.status(201).json({
+      res.status(200).json({
         status: {
           message: "Post unliked!",
-          code: 201,
+          code: 200,
         },
       });
     } else {
@@ -246,10 +246,10 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
       await post.updateOne({
         $inc: { likes: 1 },
       });
-      res.status(201).json({
+      res.status(200).json({
         status: {
           message: "Post liked!",
-          code: 201,
+          code: 200,
         },
       });
     }
@@ -266,6 +266,36 @@ const toggleLikePost = asyncHandler(async (req, res, next) => {
   }
 });
 
+const fetchUserPosts = asyncHandler(async (req, res, next) => {
+  // get the username from the params
+  const username = req.params.username;
+
+  // find the user by the username
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    return next(
+      res.status(404).json({
+        status: {
+          message: "User not found",
+          code: 404,
+        },
+      })
+    );
+  }
+
+  // find all the posts by the user
+  const posts = await Post.find({ userId: user._id });
+
+  res.json({
+    status: {
+      message: "Success",
+      code: 200,
+    },
+    data: posts,
+  });
+});
+
 module.exports = {
   index,
   store,
@@ -273,4 +303,5 @@ module.exports = {
   update,
   destroy,
   toggleLikePost,
+  fetchUserPosts,
 };
