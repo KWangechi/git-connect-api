@@ -15,7 +15,7 @@ app.use(express.json());
  */
 const index = asyncHandler(async (req, res, next) => {
   // get all the Comments from the database using mongoose
-  const comments = await Comment.find({ postId: req.params.postId });
+  const comments = await Comment.find({ postId: req.params.postId }).populate("commentedBy");
 
   res.status(200).json({
     status: {
