@@ -153,15 +153,12 @@ const update = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // find all the posts by the user
-  const posts = await Post.find({ userId: user._id }).populate("createdBy");
-
   res.status(200).json({
     status: {
       message: "Post updated successfully",
       code: 200,
     },
-    data: posts,
+    data: post,
   });
 });
 
